@@ -1,8 +1,7 @@
 #ifndef OLLVM_PASSES_H
 #define OLLVM_PASSES_H
 
-#include "../../../include/interfaces.h"
-
+#include "interfaces.h"
 namespace llvm {
     class Function;
 }
