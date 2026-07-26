@@ -1,8 +1,7 @@
 #ifndef AI_RESISTANT_PASSES_H
 #define AI_RESISTANT_PASSES_H
 
-#include "../../include/interfaces.h"
-
+#include "interfaces.h"
 namespace llvm {
     class Function;
 }
