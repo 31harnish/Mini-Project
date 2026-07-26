@@ -38,6 +38,7 @@ struct ProtectionPlan {
     std::vector<std::string> selected_passes;   // ordered list of pass names to run
     int intensity_level;             // 1 (light) to 5 (heavy)
     int max_transformation_rounds;   // upper bound for the iterate loop
+    double target_llm_reconstruction_accuracy;  // budget threshold (lower = better confused)
 };
 
 /**
