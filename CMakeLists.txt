@@ -25,6 +25,7 @@ add_library(BuildController OBJECT src/planner/build_controller.cpp)
 
 # Top-level executable / pass-plugin linking them all together
 add_executable(obfuscation_framework 
+    src/main.cpp
     $<TARGET_OBJECTS:FeatureExtraction>
     $<TARGET_OBJECTS:ThreatAnalyzer>
     $<TARGET_OBJECTS:ProtectionPlanner>
