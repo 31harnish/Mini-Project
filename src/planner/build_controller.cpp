@@ -46,25 +46,39 @@ void run_obfuscation_pipeline(llvm::Module& M) {
     // 3. Protection Planning
     auto plans = planner::generate_plan(threats, features);
     
-    // 4, 5, 6. Iterative Application
+    // 4, 5, 6, 7. Iterative Application with LLM-Confusion Feedback Loop
     for (const auto& plan : plans) {
         int rounds = plan.max_transformation_rounds;
+        std::cout << "Starting protection for " << plan.function_name << " (Target LLM accuracy <= " 
+                  << (plan.target_llm_reconstruction_accuracy * 100) << "%)" << std::endl;
+                  
         for (int i = 0; i < rounds; ++i) {
             // Get randomized order
             auto ordered_passes = diversification::get_randomized_pass_order(plan, 42 + i);
             
             // Dummy logic: just printing what we'd do
-            std::cout << "Applying passes for " << plan.function_name << " (Round " << i + 1 << ")" << std::endl;
+            std::cout << "  Applying passes (Round " << i + 1 << ")" << std::endl;
             
             // Passes would actually take the function reference here
             // passes::existing::apply_ollvm_passes(F, plan);
             // passes::novel::apply_ai_resistant_passes(F, plan);
+            
+            // 7. Intermediate Evaluation
+            // Evaluate intermediate IR or a mock binary to check LLM reconstruction accuracy
+            auto metrics = eval::evaluate_binary("out.base.bin", "out.intermediate.bin");
+            
+            std::cout << "  -> Current LLM Reconstruction Accuracy: " << (metrics.llm_reconstruction_accuracy * 100) << "%" << std::endl;
+            
+            if (metrics.llm_reconstruction_accuracy <= plan.target_llm_reconstruction_accuracy) {
+                std::cout << "  -> SUCCESS: LLM confusion budget met early. Stopping iterations for " << plan.function_name << "." << std::endl;
+                break;
+            }
         }
     }
     
-    // 7. Evaluation (typically on the compiled binary, mock call here)
-    auto metrics = eval::evaluate_binary("out.base.bin", "out.obf.bin");
-    std::cout << "Pipeline complete. Evaluation overhead: " << metrics.runtime_overhead_pct << "%" << std::endl;
+    // Final evaluation
+    auto final_metrics = eval::evaluate_binary("out.base.bin", "out.obf.bin");
+    std::cout << "Pipeline complete. Final runtime overhead: " << final_metrics.runtime_overhead_pct << "%" << std::endl;
 }
 
 } // namespace planner
