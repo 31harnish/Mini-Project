@@ -43,3 +43,8 @@ bin/
 .Trashes
 ehthumbs.db
 Thumbs.db
+
+# Python & Synthetic Dataset temporary files
+venv/
+*.ll
+synthetic_dataset.cpp
