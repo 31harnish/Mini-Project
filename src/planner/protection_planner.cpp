@@ -24,13 +24,10 @@
 
 namespace planner {
 
-// Tuning Constants
-const double HIGH_RISK_THRESHOLD = 0.8;
-const double MED_RISK_THRESHOLD = 0.4;
-
 std::vector<ProtectionPlan> generate_plan(
     const std::vector<ThreatReport>& reports,
     const std::vector<FeatureVector>& features) {
+    (void)features; // Avoid unused parameter warning
     
     std::vector<ProtectionPlan> plans;
     
@@ -38,17 +35,27 @@ std::vector<ProtectionPlan> generate_plan(
         ProtectionPlan plan;
         plan.function_name = report.function_name;
         
-        if (report.risk_score >= HIGH_RISK_THRESHOLD) {
+        const auto& profile = report.profile;
+        plan.max_transformation_rounds = profile.transformation_rounds;
+        
+        if (profile.obfuscation_intensity == "Maximum") {
             plan.selected_passes = {"ControlFlowFlattening", "DecoyIdiomInjection", "SemanticDivergence", "SymbolPoisoning"};
             plan.intensity_level = 5;
-            plan.max_transformation_rounds = 3;
-            plan.target_llm_reconstruction_accuracy = 0.20; // Need high confusion (<= 20% accuracy)
-        } else {
+            plan.target_llm_reconstruction_accuracy = 0.20;
+        } else if (profile.obfuscation_intensity == "High") {
+            plan.selected_passes = {"ControlFlowFlattening", "SemanticDivergence", "SymbolPoisoning"};
+            plan.intensity_level = 4;
+            plan.target_llm_reconstruction_accuracy = 0.30;
+        } else if (profile.obfuscation_intensity == "Medium") {
+            plan.selected_passes = {"InstructionSubstitution", "DecoyIdiomInjection", "SymbolPoisoning"};
+            plan.intensity_level = 3;
+            plan.target_llm_reconstruction_accuracy = 0.45;
+        } else { // Low or None
             plan.selected_passes = {"InstructionSubstitution", "SymbolPoisoning"};
-            plan.intensity_level = 2;
-            plan.max_transformation_rounds = 1;
-            plan.target_llm_reconstruction_accuracy = 0.50; // Moderate confusion is fine
+            plan.intensity_level = 1;
+            plan.target_llm_reconstruction_accuracy = 0.60;
         }
+        
         plans.push_back(plan);
     }
     

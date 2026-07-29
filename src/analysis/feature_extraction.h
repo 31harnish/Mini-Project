@@ -2,13 +2,21 @@
 #define FEATURE_EXTRACTION_H
 
 #include "../../include/interfaces.h"
-
-namespace llvm {
-    class Module;
-}
+#include <llvm/IR/PassManager.h>
+#include <llvm/IR/Module.h>
+#include <vector>
 
 namespace analysis {
-    std::vector<FeatureVector> extract_features(llvm::Module& M);
-}
+
+// Legacy API called by build_controller.cpp
+std::vector<FeatureVector> extract_features(llvm::Module& M);
+
+// Proper LLVM Module Pass
+class FeatureExtractionPass : public llvm::PassInfoMixin<FeatureExtractionPass> {
+public:
+    llvm::PreservedAnalyses run(llvm::Module &M, llvm::ModuleAnalysisManager &AM);
+};
+
+} // namespace analysis
 
 #endif // FEATURE_EXTRACTION_H

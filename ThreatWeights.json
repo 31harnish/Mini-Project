@@ -1,0 +1,21 @@
+{
+  "structural": {
+    "cyclomatic_complexity": 2.0,
+    "cfg_density": 15.0,
+    "basic_blocks": 0.5
+  },
+  "behavioral": {
+    "loops": 5.0,
+    "recursion": 15.0
+  },
+  "security": {
+    "crypto": 35.0,
+    "auth": 30.0,
+    "secrets": 20.0
+  },
+  "resource": {
+    "file_io": 10.0,
+    "network_io": 15.0,
+    "memory_intensity": 10.0
+  }
+}

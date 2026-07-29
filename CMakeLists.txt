@@ -14,7 +14,16 @@ link_directories(${LLVM_LIBRARY_DIRS})
 include_directories(include)
 
 # Compile each module as its own object library
-add_library(FeatureExtraction OBJECT src/analysis/feature_extraction.cpp)
+add_library(FeatureExtraction OBJECT 
+    src/analysis/feature_extraction.cpp
+    src/analysis/CFGAnalyzer.cpp
+    src/analysis/ComplexityAnalyzer.cpp
+    src/analysis/InstructionAnalyzer.cpp
+    src/analysis/SecurityAnalyzer.cpp
+    src/analysis/ConstantAnalyzer.cpp
+    src/analysis/CallGraphAnalyzer.cpp
+    src/analysis/Serializer.cpp
+)
 add_library(ThreatAnalyzer OBJECT src/analysis/threat_analyzer.cpp)
 add_library(ProtectionPlanner OBJECT src/planner/protection_planner.cpp)
 add_library(OLLVMPasses OBJECT src/passes/existing/ollvm_passes.cpp)

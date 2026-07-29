@@ -10,13 +10,58 @@
  */
 struct FeatureVector {
     std::string function_name;
-    int cyclomatic_complexity;
-    int basic_block_count;
+
+    // Structural
+    unsigned basic_block_count;
+    unsigned instructions;
+    unsigned cyclomatic_complexity;
     double cfg_density;
-    int instruction_diversity;      // count of distinct instruction opcodes used
-    bool is_sensitive;              // true if flagged as login/crypto/auth-like
+
+    // Control Flow
+    unsigned branch_count;
+    unsigned switch_count;
+    unsigned loop_count;
+    unsigned max_loop_depth;
+
+    // Calls
+    unsigned call_count;
+    unsigned external_calls;
+    bool recursive;
+
+    // Memory
+    unsigned loads;
+    unsigned stores;
+    unsigned allocas;
+
+    // Instruction Mix
+    unsigned arithmetic_ops;
+    unsigned logic_ops;
+    unsigned compare_ops;
+
+    // Security
+    bool crypto_api;
+    bool auth_api;
+    bool file_io;
+    bool network_io;
+
+    unsigned secret_strings;
+    unsigned integer_constants;
+
+    // Derived
+    double instruction_diversity;
+    double memory_intensity;
+
+    // Legacy fields for backward compatibility
+    bool is_sensitive;
     int call_graph_fan_in;
     int call_graph_fan_out;
+};
+
+struct ProtectionProfile {
+    std::string obfuscation_intensity; // "None", "Low", "Medium", "High", "Maximum"
+    std::string diversification_level; // "None", "Low", "Medium", "High", "Maximum"
+    int transformation_rounds;          // 0 to 3
+    std::string performance_priority;  // "High", "Medium", "Low"
 };
 
 /**
@@ -25,8 +70,10 @@ struct FeatureVector {
  */
 struct ThreatReport {
     std::string function_name;
-    double risk_score;              // 0.0 (low) to 1.0 (critical)
-    std::string sensitivity_category; // e.g. "authentication", "encryption", "generic"
+    double risk_score;                 // 0.0 to 100.0
+    std::string risk_level;            // "Low", "Medium", "High", "Critical"
+    ProtectionProfile profile;
+    std::string sensitivity_category;  // For legacy compatibility
 };
 
 /**
