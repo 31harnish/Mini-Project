@@ -51,6 +51,7 @@ void FeatureSerializer::serialize(const std::vector<FeatureVector> &featuresList
         // Derived
         jsonFv["instruction_diversity"] = fv.instruction_diversity;
         jsonFv["memory_intensity"] = fv.memory_intensity;
+        jsonFv["string_entropy"] = fv.string_entropy;
 
         jsonList.push_back(std::move(jsonFv));
     }

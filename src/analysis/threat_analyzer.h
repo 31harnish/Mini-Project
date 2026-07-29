@@ -43,6 +43,7 @@ public:
 class ReportGenerator {
 public:
     static void generateJsonReport(const std::vector<ThreatReport> &reports, const std::string &outputPath);
+    static void generateCsvDataset(const std::vector<ThreatReport> &reports, const std::vector<FeatureVector> &features, const std::string &outputPath);
 };
 
 // Legacy/Main coordinator API

@@ -6,6 +6,8 @@
 #include <set>
 #include <algorithm>
 #include <cctype>
+#include <cmath>
+#include <map>
 
 namespace analysis {
 
@@ -13,6 +15,21 @@ static std::string toLower(std::string s) {
     std::transform(s.begin(), s.end(), s.begin(),
                    [](unsigned char c) { return std::tolower(c); });
     return s;
+}
+
+static double calculateShannonEntropy(const std::string &s) {
+    if (s.empty()) return 0.0;
+    std::map<char, double> frequencies;
+    for (char c : s) {
+        frequencies[c]++;
+    }
+    double entropy = 0.0;
+    double len = s.length();
+    for (auto const& kv : frequencies) {
+        double p = kv.second / len;
+        entropy -= p * std::log2(p);
+    }
+    return entropy;
 }
 
 static const llvm::GlobalVariable* getGlobalVariable(const llvm::Value *val) {
@@ -32,6 +49,7 @@ static const llvm::GlobalVariable* getGlobalVariable(const llvm::Value *val) {
 void ConstantAnalyzer::analyze(llvm::Function &F, FeatureVector &features) {
     unsigned secretStrings = 0;
     unsigned integerConstants = 0;
+    double maxEntropy = 0.0;
     std::set<const llvm::GlobalVariable*> checkedGlobals;
 
     std::vector<std::string> sensitiveKeywords = {
@@ -54,8 +72,13 @@ void ConstantAnalyzer::analyze(llvm::Function &F, FeatureVector &features) {
                         if (gv->hasInitializer()) {
                             if (auto *cdata = llvm::dyn_cast<llvm::ConstantDataSequential>(gv->getInitializer())) {
                                 if (cdata->isString()) {
-                                    std::string strContent = toLower(cdata->getAsString().str());
-                                    
+                                    std::string rawStr = cdata->getAsString().str();
+                                    double entropy = calculateShannonEntropy(rawStr);
+                                    if (entropy > maxEntropy) {
+                                        maxEntropy = entropy;
+                                    }
+
+                                    std::string strContent = toLower(rawStr);
                                     bool isSecret = false;
                                     for (const auto& keyword : sensitiveKeywords) {
                                         if (strContent.find(keyword) != std::string::npos) {
@@ -77,6 +100,7 @@ void ConstantAnalyzer::analyze(llvm::Function &F, FeatureVector &features) {
 
     features.secret_strings = secretStrings;
     features.integer_constants = integerConstants;
+    features.string_entropy = maxEntropy;
 }
 
 } // namespace analysis

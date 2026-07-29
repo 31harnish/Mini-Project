@@ -50,6 +50,7 @@ struct FeatureVector {
     // Derived
     double instruction_diversity;
     double memory_intensity;
+    double string_entropy;
 
     // Legacy fields for backward compatibility
     bool is_sensitive;

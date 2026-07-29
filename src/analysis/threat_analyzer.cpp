@@ -249,6 +249,31 @@ void ReportGenerator::generateJsonReport(const std::vector<ThreatReport> &report
     os << llvm::formatv("{0:2}", llvm::json::Value(std::move(jsonList)));
 }
 
+void ReportGenerator::generateCsvDataset(const std::vector<ThreatReport> &reports, const std::vector<FeatureVector> &features, const std::string &outputPath) {
+    std::error_code ec;
+    llvm::raw_fd_ostream os(outputPath, ec, llvm::sys::fs::OF_None);
+    if (ec) {
+        llvm::errs() << "Error: Could not open output file for CSV report: " << ec.message() << "\n";
+        return;
+    }
+    
+    os << "Function Name,Block_Count,Complexity,Inst_Count,Loop_Depth,Has_Crypto,String_Entropy,Target Risk Score\n";
+    
+    for (size_t i = 0; i < reports.size() && i < features.size(); ++i) {
+        const auto &tr = reports[i];
+        const auto &fv = features[i];
+        
+        os << "\"" << tr.function_name << "\","
+           << fv.basic_block_count << ","
+           << fv.cyclomatic_complexity << ","
+           << fv.instructions << ","
+           << fv.max_loop_depth << ","
+           << (fv.crypto_api ? 1 : 0) << ","
+           << fv.string_entropy << ","
+           << (tr.risk_score / 100.0) << "\n";
+    }
+}
+
 // -------------------------------------------------------------------
 // Main Coordinator Function
 // -------------------------------------------------------------------
@@ -275,8 +300,9 @@ std::vector<ThreatReport> analyze_threats(const std::vector<FeatureVector>& feat
         reports.push_back(tr);
     }
     
-    // Save report to risk.json
+    // Save report to risk.json and training dataset to features_dataset.csv
     ReportGenerator::generateJsonReport(reports, "risk.json");
+    ReportGenerator::generateCsvDataset(reports, features, "features_dataset.csv");
     
     return reports;
 }
