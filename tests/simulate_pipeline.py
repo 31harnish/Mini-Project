@@ -166,29 +166,72 @@ def analyze_threats(features, profile="balanced"):
 
 def generate_plan(reports, features):
     plans = []
-    HIGH_RISK_THRESHOLD = 0.8
-
     # Index features by function name
     feat_map = {f["function_name"]: f for f in features}
 
     for r in reports:
         func_name = r["function_name"]
         risk = r["risk_score"]
+        feat = feat_map.get(func_name, {})
         
-        if risk >= HIGH_RISK_THRESHOLD:
-            selected_passes = ["ControlFlowFlattening", "DecoyIdiomInjection", "SemanticDivergence", "SymbolPoisoning"]
-            intensity = 5
-            rounds = 3
-            target_acc = 0.20
+        # 1. Calculate Intensity
+        intensity = 1
+        if risk >= 0.9: intensity = 5
+        elif risk >= 0.7: intensity = 4
+        elif risk >= 0.5: intensity = 3
+        elif risk >= 0.2: intensity = 2
+        
+        # 2. Budget Overhead Cap
+        bb_count = feat.get("basic_block_count", 0)
+        cyc = feat.get("cyclomatic_complexity", 0)
+        is_sens = feat.get("is_sensitive", False)
+        
+        if bb_count > 500 and cyc > 50 and not is_sens:
+            intensity = min(intensity, 4)
+            
+        # 3. Rounds and Target Accuracy
+        rounds = 3 if intensity >= 5 else (2 if intensity >= 3 else 1)
+        target_acc = 1.0 - (intensity * 0.15)
+        
+        # 4. Pass Selection
+        if intensity == 1:
+            passes = ["instruction_substitution"]
+        elif intensity == 2:
+            passes = ["instruction_substitution", "bogus_control_flow"]
+        elif intensity == 3:
+            passes = ["bogus_control_flow", "adaptive_cfg_diversification", "semantic_divergence"]
+        elif intensity == 4:
+            passes = ["decoy_idiom", "bogus_control_flow", "control_flow_flattening"]
         else:
-            selected_passes = ["InstructionSubstitution", "SymbolPoisoning"]
-            intensity = 2
-            rounds = 1
-            target_acc = 0.50
+            passes = ["string_obfuscation", "decoy_idiom", "control_flow_flattening", "semantic_divergence"]
+            
+        # 5. Sensitivity Overrides
+        category = r["sensitivity_category"]
+        if category == "authentication":
+            if "string_obfuscation" not in passes: passes.append("string_obfuscation")
+            if "decoy_idiom" not in passes: passes.append("decoy_idiom")
+        elif category == "encryption" and bb_count > 100:
+            if "control_flow_flattening" in passes: passes.remove("control_flow_flattening")
+            if "semantic_divergence" not in passes: passes.append("semantic_divergence")
+            if "instruction_substitution" not in passes: passes.append("instruction_substitution")
+            
+        # 6. Sort passes
+        def pass_priority(p):
+            if p in ["string_obfuscation", "instruction_substitution", "semantic_divergence"]: return 1
+            if p in ["decoy_idiom", "bogus_control_flow"]: return 2
+            if p in ["control_flow_flattening", "adaptive_cfg_diversification"]: return 3
+            return 99
+            
+        passes.sort(key=pass_priority)
+        
+        # Remove duplicates preserving order
+        final_passes = []
+        for p in passes:
+            if p not in final_passes: final_passes.append(p)
 
         plans.append({
             "function_name": func_name,
-            "selected_passes": selected_passes,
+            "selected_passes": final_passes,
             "intensity_level": intensity,
             "max_transformation_rounds": rounds,
             "target_llm_reconstruction_accuracy": target_acc

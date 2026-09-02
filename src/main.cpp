@@ -3,6 +3,7 @@
 #include <llvm/IRReader/IRReader.h>
 #include <llvm/Support/SourceMgr.h>
 #include <llvm/Support/raw_ostream.h>
+#include <llvm/Support/FileSystem.h>
 #include <iostream>
 #include "planner/build_controller.h"
 
@@ -23,6 +24,16 @@ int main(int argc, char** argv) {
 
     std::cout << "Successfully parsed LLVM IR: " << argv[1] << std::endl;
     planner::run_obfuscation_pipeline(*M);
+
+    // Write the output to a file so we can verify the transformations
+    std::error_code EC;
+    llvm::raw_fd_ostream OS("obfuscated.ll", EC, llvm::sys::fs::OF_None);
+    if (!EC) {
+        M->print(OS, nullptr);
+        std::cout << "Successfully wrote obfuscated IR to obfuscated.ll" << std::endl;
+    } else {
+        std::cerr << "Failed to write output: " << EC.message() << std::endl;
+    }
 
     return 0;
 }

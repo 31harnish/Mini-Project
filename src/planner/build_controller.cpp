@@ -1,8 +1,8 @@
 /**
  * @file build_controller.cpp
- * @brief Module 8 — Build Controller
+ * @brief Module 7 — Adaptive Evaluation & Build Controller
  * 
- * Responsibility: orchestrate the full pipeline in order (1→2→3→4/5→6→7),
+ * Responsibility: orchestrate the full pipeline in order,
  * and implement the iterate loop — after each transformation round, check
  * intermediate metrics against the plan's target and either run another round
  * or finalize the build.
@@ -26,10 +26,12 @@
 #include "../analysis/feature_extraction.h"
 #include "../analysis/threat_analyzer.h"
 #include "protection_planner.h"
+#include "planner_utils.h"
 #include "../diversification/diversification_engine.h"
 #include "../passes/existing/ollvm_passes.h"
 #include "../passes/novel/ai_resistant_passes.h"
 #include "../eval/evaluation_engine.h"
+#include <llvm/IR/Verifier.h>
 #include <iostream>
 
 namespace planner {
@@ -45,10 +47,23 @@ void run_obfuscation_pipeline(llvm::Module& M) {
     
     // 3. Protection Planning
     auto plans = planner::generate_plan(threats, features);
+    std::cout << "--- Planner Output (JSON Debug) ---" << std::endl;
+    for (const auto& plan : plans) {
+        std::cout << dumpPlanToJson(plan) << std::endl;
+    }
+    std::cout << "-----------------------------------" << std::endl;
+
     
     // 4, 5, 6, 7. Iterative Application with LLM-Confusion Feedback Loop
     for (const auto& plan : plans) {
         int rounds = plan.max_transformation_rounds;
+        
+        llvm::Function* F = M.getFunction(plan.function_name);
+        if (!F || F->isDeclaration()) {
+            std::cerr << "Warning: Function " << plan.function_name << " not found or is a declaration. Skipping." << std::endl;
+            continue;
+        }
+
         std::cout << "Starting protection for " << plan.function_name << " (Target LLM accuracy <= " 
                   << (plan.target_llm_reconstruction_accuracy * 100) << "%)" << std::endl;
                   
@@ -56,12 +71,18 @@ void run_obfuscation_pipeline(llvm::Module& M) {
             // Get randomized order
             auto ordered_passes = diversification::get_randomized_pass_order(plan, 42 + i);
             
-            // Dummy logic: just printing what we'd do
             std::cout << "  Applying passes (Round " << i + 1 << ")" << std::endl;
             
-            // Passes would actually take the function reference here
-            // passes::existing::apply_ollvm_passes(F, plan);
-            // passes::novel::apply_ai_resistant_passes(F, plan);
+            // Execute Module 4 (Existing OLLVM passes)
+            passes::existing::apply_ollvm_passes(*F, plan);
+            
+            // Verify IR correctness
+            if (llvm::verifyFunction(*F, &llvm::errs())) {
+                std::cerr << "Error: IR verification failed for " << plan.function_name << " after obfuscation!" << std::endl;
+                // In a real framework we might abort or rollback here
+            }
+
+            // passes::novel::apply_ai_resistant_passes(*F, plan);
             
             // 7. Intermediate Evaluation
             // Evaluate intermediate IR or a mock binary to check LLM reconstruction accuracy

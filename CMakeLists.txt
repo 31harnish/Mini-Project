@@ -16,7 +16,7 @@ include_directories(include)
 # Compile each module as its own object library
 add_library(FeatureExtraction OBJECT src/analysis/feature_extraction.cpp)
 add_library(ThreatAnalyzer OBJECT src/analysis/threat_analyzer.cpp)
-add_library(ProtectionPlanner OBJECT src/planner/protection_planner.cpp)
+add_library(ProtectionPlanner OBJECT src/planner/protection_planner.cpp src/planner/planner_utils.cpp)
 add_library(OLLVMPasses OBJECT src/passes/existing/ollvm_passes.cpp)
 add_library(AIResistantPasses OBJECT src/passes/novel/ai_resistant_passes.cpp)
 add_library(DiversificationEngine OBJECT src/diversification/diversification_engine.cpp)

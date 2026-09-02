@@ -11,9 +11,11 @@
 #include <llvm/IR/Module.h>
 #include <llvm/IR/Constants.h>
 #include <llvm/IR/GlobalVariable.h>
+#include <llvm/Transforms/Utils/Local.h> // For DemotePHIToStack
 #include <vector>
 #include <map>
 #include <iostream>
+#include <random>
 
 using namespace llvm;
 
@@ -21,12 +23,18 @@ namespace passes {
 namespace existing {
 
 // 1. Instruction Substitution: a = b + c -> a = (b ^ c) + 2 * (b & c)
-static void applyInstructionSubstitution(Function& F) {
+static void applyInstructionSubstitution(Function& F, int intensity) {
     std::vector<Instruction*> toReplace;
+    
+    // Intensity defines probability: 1-2 -> 30%, 3-5 -> 100%
+    int probability_threshold = (intensity >= 3) ? 100 : 30;
+    
     for (auto& BB : F) {
         for (auto& I : BB) {
             if (I.getOpcode() == Instruction::Add && I.getType()->isIntegerTy()) {
-                toReplace.push_back(&I);
+                if ((rand() % 100) < probability_threshold) {
+                    toReplace.push_back(&I);
+                }
             }
         }
     }
@@ -47,10 +55,16 @@ static void applyInstructionSubstitution(Function& F) {
 }
 
 // 2. Bogus Control Flow: Inject opaque predicates
-static void applyBogusControlFlow(Function& F) {
+static void applyBogusControlFlow(Function& F, int intensity) {
     std::vector<BasicBlock*> blocks;
+    
+    // Intensity defines % of blocks to apply to (20% per intensity level)
+    int probability_threshold = intensity * 20;
+
     for (auto& BB : F) {
-        blocks.push_back(&BB);
+        if ((rand() % 100) < probability_threshold) {
+            blocks.push_back(&BB);
+        }
     }
     
     LLVMContext& Ctx = F.getContext();
@@ -62,7 +76,7 @@ static void applyBogusControlFlow(Function& F) {
         BB->getTerminator()->eraseFromParent();
         
         IRBuilder<> builder(BB);
-        // Opaque predicate: 1 == 1
+        // Opaque predicate: 1 == 1. In high intensity, this could be more complex.
         Value* cmp = builder.CreateICmpEQ(builder.getInt32(1), builder.getInt32(1));
         
         BasicBlock* junkBB = BasicBlock::Create(Ctx, "bcf_junk", &F);
@@ -74,10 +88,28 @@ static void applyBogusControlFlow(Function& F) {
     }
 }
 
+// Helper to demote PHI nodes before Control Flow Flattening
+static void demotePHINodes(Function& F) {
+    std::vector<PHINode*> phis;
+    for (auto& BB : F) {
+        for (auto& I : BB) {
+            if (auto* phi = dyn_cast<PHINode>(&I)) {
+                phis.push_back(phi);
+            }
+        }
+    }
+    for (auto* phi : phis) {
+        DemotePHIToStack(phi, F.begin()->getTerminator());
+    }
+}
+
 // 3. Control Flow Flattening (PoC)
 static void applyControlFlowFlattening(Function& F) {
     if (F.empty()) return;
     
+    // Must demote PHI nodes to prevent broken IR across flattened blocks
+    demotePHINodes(F);
+
     std::vector<BasicBlock*> origBlocks;
     for (auto& BB : F) {
         if (!BB.isEHPad()) {
@@ -168,16 +200,16 @@ static void applyStringEncryption(Function& F) {
 bool apply_ollvm_passes(llvm::Function& F, const ProtectionPlan& plan) {
     bool transformed = false;
     for (const auto& pass_name : plan.selected_passes) {
-        if (pass_name == "InstructionSubstitution") {
-            applyInstructionSubstitution(F);
+        if (pass_name == "instruction_substitution") {
+            applyInstructionSubstitution(F, plan.intensity_level);
             transformed = true;
-        } else if (pass_name == "BogusControlFlow") {
-            applyBogusControlFlow(F);
+        } else if (pass_name == "bogus_control_flow") {
+            applyBogusControlFlow(F, plan.intensity_level);
             transformed = true;
-        } else if (pass_name == "ControlFlowFlattening") {
+        } else if (pass_name == "control_flow_flattening") {
             applyControlFlowFlattening(F);
             transformed = true;
-        } else if (pass_name == "StringEncryption") {
+        } else if (pass_name == "string_obfuscation") {
             applyStringEncryption(F);
             transformed = true;
         }
