@@ -39,7 +39,18 @@ struct ProtectionPlan {
     int intensity_level;             // 1 (light) to 5 (heavy)
     int max_transformation_rounds;   // upper bound for the iterate loop
     double target_llm_reconstruction_accuracy;  // budget threshold (lower = better confused)
+    uint64_t random_seed = 0;        // seed for deterministic pass invocation
 };
 
+/**
+ * @brief Aggregated evaluation metrics from the obfuscation pipeline.
+ * Produced by Module 4 (Orchestrator), consumed by Module 7 (Build Controller).
+ */
+struct EvaluationMetrics {
+    double overhead = 0.0;
+    double size_bloat = 0.0;
+    double cfg_complexity = 0.0;
+    double llm_reconstruction_accuracy = 0.0;
+};
 
 #endif // INTERFACES_H

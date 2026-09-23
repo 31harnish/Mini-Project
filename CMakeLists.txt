@@ -19,6 +19,14 @@ add_library(ThreatAnalyzer OBJECT src/analysis/threat_analyzer.cpp)
 add_library(ProtectionPlanner OBJECT src/planner/protection_planner.cpp src/planner/planner_utils.cpp)
 add_library(BuildController OBJECT src/planner/build_controller.cpp)
 
+# Module 4: Orchestration layer
+add_library(Orchestration OBJECT
+    src/orchestration/pass_order_resolver.cpp
+    src/orchestration/intensity_params.cpp
+    src/orchestration/module4_orchestrator.cpp
+    src/orchestration/fake_backend.cpp
+)
+
 # Top-level executable / pass-plugin linking them all together
 add_executable(obfuscation_framework 
     src/main.cpp
@@ -26,8 +34,30 @@ add_executable(obfuscation_framework
     $<TARGET_OBJECTS:ThreatAnalyzer>
     $<TARGET_OBJECTS:ProtectionPlanner>
     $<TARGET_OBJECTS:BuildController>
+    $<TARGET_OBJECTS:Orchestration>
 )
 
 # LLVM component linking
 llvm_map_components_to_libnames(llvm_libs Core IRReader Support Analysis Passes)
 target_link_libraries(obfuscation_framework ${llvm_libs})
+
+# --- Test targets ---
+
+# Test: PassOrderResolver
+add_executable(test_pass_order
+    tests/orchestration/test_pass_order_resolver.cpp
+    $<TARGET_OBJECTS:Orchestration>
+)
+
+# Test: IntensityToParams
+add_executable(test_intensity_params
+    tests/orchestration/test_intensity_params.cpp
+    $<TARGET_OBJECTS:Orchestration>
+)
+
+# Test: Module4 Orchestrator (needs FakeBackend)
+add_executable(test_orchestration
+    tests/orchestration/test_module4_orchestrator.cpp
+    $<TARGET_OBJECTS:Orchestration>
+)
+
