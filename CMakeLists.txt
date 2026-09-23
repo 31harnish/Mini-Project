@@ -25,6 +25,18 @@ add_library(Orchestration OBJECT
     src/orchestration/intensity_params.cpp
     src/orchestration/module4_orchestrator.cpp
     src/orchestration/fake_backend.cpp
+    src/orchestration/real_backend.cpp
+)
+
+# Module 4: LLVM pass plugin (loaded by opt at runtime)
+add_library(ObfPasses MODULE src/passes/ExistingPasses.cpp)
+target_compile_options(ObfPasses PRIVATE -fno-rtti)
+# On macOS, MODULE libraries need undefined symbols to be allowed
+# since they'll be resolved by the host process (opt).
+set_target_properties(ObfPasses PROPERTIES
+    PREFIX ""
+    SUFFIX ".dylib"
+    LINK_FLAGS "-undefined dynamic_lookup"
 )
 
 # Top-level executable / pass-plugin linking them all together
@@ -60,4 +72,11 @@ add_executable(test_orchestration
     tests/orchestration/test_module4_orchestrator.cpp
     $<TARGET_OBJECTS:Orchestration>
 )
+
+# Test: RealBackend integration (needs ObfPasses.dylib built first)
+add_executable(test_real_backend
+    tests/orchestration/test_real_backend.cpp
+    $<TARGET_OBJECTS:Orchestration>
+)
+add_dependencies(test_real_backend ObfPasses)
 
