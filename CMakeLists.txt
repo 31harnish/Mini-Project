@@ -17,10 +17,6 @@ include_directories(include)
 add_library(FeatureExtraction OBJECT src/analysis/feature_extraction.cpp)
 add_library(ThreatAnalyzer OBJECT src/analysis/threat_analyzer.cpp)
 add_library(ProtectionPlanner OBJECT src/planner/protection_planner.cpp src/planner/planner_utils.cpp)
-add_library(OLLVMPasses OBJECT src/passes/existing/ollvm_passes.cpp)
-add_library(AIResistantPasses OBJECT src/passes/novel/ai_resistant_passes.cpp)
-add_library(DiversificationEngine OBJECT src/diversification/diversification_engine.cpp)
-add_library(EvaluationEngine OBJECT src/eval/evaluation_engine.cpp)
 add_library(BuildController OBJECT src/planner/build_controller.cpp)
 
 # Top-level executable / pass-plugin linking them all together
@@ -29,10 +25,6 @@ add_executable(obfuscation_framework
     $<TARGET_OBJECTS:FeatureExtraction>
     $<TARGET_OBJECTS:ThreatAnalyzer>
     $<TARGET_OBJECTS:ProtectionPlanner>
-    $<TARGET_OBJECTS:OLLVMPasses>
-    $<TARGET_OBJECTS:AIResistantPasses>
-    $<TARGET_OBJECTS:DiversificationEngine>
-    $<TARGET_OBJECTS:EvaluationEngine>
     $<TARGET_OBJECTS:BuildController>
 )
 

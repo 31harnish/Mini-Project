@@ -29,6 +29,7 @@
 #include "feature_extraction.h"
 #include <algorithm>
 #include <cctype>
+#include <iostream>
 #include <llvm/IR/BasicBlock.h>
 #include <llvm/IR/Function.h>
 #include <llvm/IR/InstrTypes.h>
@@ -139,6 +140,22 @@ std::vector<FeatureVector> extract_features(llvm::Module &M) {
     features.push_back(fv);
   }
 
+  std::cout << "\n========================================================" << std::endl;
+  std::cout << "  MODULE 1: Feature Extraction Engine" << std::endl;
+  std::cout << "========================================================" << std::endl;
+  std::cout << "  Total functions analyzed: " << features.size() << "\n" << std::endl;
+
+  for (const auto& fv : features) {
+    std::cout << "  Function: " << fv.function_name << std::endl;
+    std::cout << "    Basic Block Count       : " << fv.basic_block_count << std::endl;
+    std::cout << "    Cyclomatic Complexity   : " << fv.cyclomatic_complexity << std::endl;
+    std::cout << "    Instruction Diversity   : " << fv.instruction_diversity << std::endl;
+    std::cout << "    CFG Density             : " << fv.cfg_density << std::endl;
+    std::cout << "    Call Graph Fan-In       : " << fv.call_graph_fan_in << std::endl;
+    std::cout << "    Call Graph Fan-Out      : " << fv.call_graph_fan_out << std::endl;
+    std::cout << "    Sensitive               : " << (fv.is_sensitive ? "Yes" : "No") << std::endl;
+    std::cout << std::endl;
+  }
   return features;
 }
 

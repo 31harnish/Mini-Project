@@ -31,7 +31,7 @@ struct ThreatReport {
 
 /**
  * @brief Represents the planned protection steps for a function.
- * Produced by Module 3 (Protection Planner), consumed by Module 4 (Existing Passes), Module 5 (Novel Passes), and Module 6 (Diversification Engine).
+ * Produced by Module 3 (Protection Planner).
  */
 struct ProtectionPlan {
     std::string function_name;
@@ -41,17 +41,5 @@ struct ProtectionPlan {
     double target_llm_reconstruction_accuracy;  // budget threshold (lower = better confused)
 };
 
-/**
- * @brief Represents the evaluation results of the protected binary.
- * Produced by Module 7 (Evaluation Engine), consumed by Module 8 (Build Controller) for iterative refinement.
- */
-struct EvaluationMetrics {
-    std::string binary_id;
-    double runtime_overhead_pct;
-    double binary_size_growth_pct;
-    double cfg_complexity_score;
-    double static_re_resistance_score;   // from Ghidra/IDA/angr testing
-    double llm_reconstruction_accuracy;  // lower = better resistance
-};
 
 #endif // INTERFACES_H

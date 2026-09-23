@@ -1,7 +1,7 @@
 ; ModuleID = 'tests/sample_programs/simple.cpp'
 source_filename = "tests/sample_programs/simple.cpp"
 target datalayout = "e-m:o-i64:64-i128:128-n32:64-S128"
-target triple = "arm64-apple-macosx16.0.0"
+target triple = "arm64-apple-macosx18.0.0"
 
 %"class.std::__1::basic_ostream" = type { ptr, %"class.std::__1::basic_ios.base" }
 %"class.std::__1::basic_ios.base" = type <{ %"class.std::__1::ios_base", ptr, i32 }>

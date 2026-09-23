@@ -23,6 +23,7 @@
 #include <algorithm>
 #include <cctype>
 #include <string>
+#include <iostream>
 
 namespace analysis {
 
@@ -96,6 +97,18 @@ std::vector<ThreatReport> analyze_threats(const std::vector<FeatureVector>& feat
         reports.push_back(tr);
     }
     
+    std::cout << "\n========================================================" << std::endl;
+    std::cout << "  MODULE 2: Security & Threat Analyzer" << std::endl;
+    std::cout << "========================================================" << std::endl;
+    std::cout << "  Threat Profile: " << profile << " (multiplier: " << multiplier << ")\n" << std::endl;
+
+    for (const auto& tr : reports) {
+        std::cout << "  Function: " << tr.function_name << std::endl;
+        std::cout << "    Risk Score              : " << tr.risk_score << std::endl;
+        std::cout << "    Sensitivity Category    : " << tr.sensitivity_category << std::endl;
+        std::cout << std::endl;
+    }
+
     return reports;
 }
 
