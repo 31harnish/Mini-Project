@@ -1,7 +1,7 @@
 ; ModuleID = 'tests/sample_programs/simple.ll'
 source_filename = "tests/sample_programs/simple.cpp"
 target datalayout = "e-m:o-i64:64-i128:128-n32:64-S128"
-target triple = "arm64-apple-macosx16.0.0"
+target triple = "arm64-apple-macosx18.0.0"
 
 %"class.std::__1::basic_ostream" = type { ptr, %"class.std::__1::basic_ios.base" }
 %"class.std::__1::basic_ios.base" = type <{ %"class.std::__1::ios_base", ptr, i32 }>
@@ -37,11 +37,8 @@ define noundef i32 @_Z11add_numbersii(i32 noundef %0, i32 noundef %1) #0 {
   store i32 %1, ptr %4, align 4
   %5 = load i32, ptr %3, align 4
   %6 = load i32, ptr %4, align 4
-  %7 = xor i32 %5, %6
-  %8 = and i32 %5, %6
-  %9 = shl i32 %8, 1
-  %10 = add i32 %7, %9
-  ret i32 %10
+  %7 = add nsw i32 %5, %6
+  ret i32 %7
 }
 
 ; Function Attrs: mustprogress noinline nounwind optnone ssp uwtable(sync)
@@ -154,417 +151,158 @@ define linkonce_odr hidden noundef nonnull align 8 dereferenceable(8) ptr @_ZNSt
   store ptr %1, ptr %5, align 8
   store i64 %2, ptr %6, align 8
   %12 = load ptr, ptr %4, align 8
-  %.reg2mem = alloca ptr, align 8
-  %cff_state = alloca i32, align 4
-  store i32 1, ptr %cff_state, align 4
-  br label %cff_loop_entry
-
-cff_entry:                                        ; preds = %cff_switch
-  store i32 2, ptr %cff_state, align 4
-  br label %cff_loop_end
-
-bcf_orig_tail:                                    ; preds = %cff_switch
   %13 = invoke noundef ptr @_ZNSt3__113basic_ostreamIcNS_11char_traitsIcEEE6sentryC1ERS3_(ptr noundef nonnull align 8 dereferenceable(16) %7, ptr noundef nonnull align 8 dereferenceable(8) %12)
-          to label %14 unwind label %70
+          to label %14 unwind label %68
 
-14:                                               ; preds = %cff_switch, %bcf_orig_tail
-  store i32 4, ptr %cff_state, align 4
-  br label %cff_loop_end
-
-bcf_orig_tail1:                                   ; preds = %cff_switch
+14:                                               ; preds = %3
   %15 = invoke noundef zeroext i1 @_ZNKSt3__113basic_ostreamIcNS_11char_traitsIcEEE6sentrycvbB8ne180100Ev(ptr noundef nonnull align 8 dereferenceable(16) %7)
-          to label %16 unwind label %74
+          to label %16 unwind label %72
 
-16:                                               ; preds = %cff_switch, %bcf_orig_tail1
-  store i32 6, ptr %cff_state, align 4
-  br label %cff_loop_end
+16:                                               ; preds = %14
+  br i1 %15, label %17, label %89
 
-bcf_orig_tail3:                                   ; preds = %cff_switch
-  %17 = select i1 %15, i32 7, i32 33
-  store i32 %17, ptr %cff_state, align 4
-  br label %cff_loop_end
+17:                                               ; preds = %16
+  %18 = load ptr, ptr %4, align 8
+  %19 = call noundef ptr @_ZNSt3__119ostreambuf_iteratorIcNS_11char_traitsIcEEEC1B8ne180100ERNS_13basic_ostreamIcS2_EE(ptr noundef nonnull align 8 dereferenceable(8) %11, ptr noundef nonnull align 8 dereferenceable(8) %18) #7
+  %20 = load ptr, ptr %5, align 8
+  %21 = load ptr, ptr %4, align 8
+  %22 = load ptr, ptr %21, align 8
+  %23 = getelementptr i8, ptr %22, i64 -24
+  %24 = load i64, ptr %23, align 8
+  %25 = getelementptr inbounds i8, ptr %21, i64 %24
+  %26 = invoke noundef i32 @_ZNKSt3__18ios_base5flagsB8ne180100Ev(ptr noundef nonnull align 8 dereferenceable(136) %25)
+          to label %27 unwind label %72
 
-18:                                               ; preds = %cff_switch
-  %19 = load ptr, ptr %4, align 8
-  %20 = call noundef ptr @_ZNSt3__119ostreambuf_iteratorIcNS_11char_traitsIcEEEC1B8ne180100ERNS_13basic_ostreamIcS2_EE(ptr noundef nonnull align 8 dereferenceable(8) %11, ptr noundef nonnull align 8 dereferenceable(8) %19) #7
-  %21 = load ptr, ptr %5, align 8
-  %22 = load ptr, ptr %4, align 8
-  %23 = load ptr, ptr %22, align 8
-  %24 = getelementptr i8, ptr %23, i64 -24
-  %25 = load i64, ptr %24, align 8
-  %26 = getelementptr inbounds i8, ptr %22, i64 %25
-  store i32 8, ptr %cff_state, align 4
-  br label %cff_loop_end
+27:                                               ; preds = %17
+  %28 = and i32 %26, 176
+  %29 = icmp eq i32 %28, 32
+  br i1 %29, label %30, label %34
 
-bcf_orig_tail5:                                   ; preds = %cff_switch
-  %27 = invoke noundef i32 @_ZNKSt3__18ios_base5flagsB8ne180100Ev(ptr noundef nonnull align 8 dereferenceable(136) %26)
-          to label %28 unwind label %74
+30:                                               ; preds = %27
+  %31 = load ptr, ptr %5, align 8
+  %32 = load i64, ptr %6, align 8
+  %33 = getelementptr inbounds i8, ptr %31, i64 %32
+  br label %36
 
-28:                                               ; preds = %cff_switch, %bcf_orig_tail5
-  %29 = and i32 %27, 176
-  %30 = icmp eq i32 %29, 32
-  store i32 10, ptr %cff_state, align 4
-  br label %cff_loop_end
+34:                                               ; preds = %27
+  %35 = load ptr, ptr %5, align 8
+  br label %36
 
-bcf_orig_tail7:                                   ; preds = %cff_switch
-  %31 = select i1 %30, i32 11, i32 13
-  store i32 %31, ptr %cff_state, align 4
-  br label %cff_loop_end
+36:                                               ; preds = %34, %30
+  %37 = phi ptr [ %33, %30 ], [ %35, %34 ]
+  %38 = load ptr, ptr %5, align 8
+  %39 = load i64, ptr %6, align 8
+  %40 = getelementptr inbounds i8, ptr %38, i64 %39
+  %41 = load ptr, ptr %4, align 8
+  %42 = load ptr, ptr %41, align 8
+  %43 = getelementptr i8, ptr %42, i64 -24
+  %44 = load i64, ptr %43, align 8
+  %45 = getelementptr inbounds i8, ptr %41, i64 %44
+  %46 = load ptr, ptr %4, align 8
+  %47 = load ptr, ptr %46, align 8
+  %48 = getelementptr i8, ptr %47, i64 -24
+  %49 = load i64, ptr %48, align 8
+  %50 = getelementptr inbounds i8, ptr %46, i64 %49
+  %51 = invoke noundef signext i8 @_ZNKSt3__19basic_iosIcNS_11char_traitsIcEEE4fillB8ne180100Ev(ptr noundef nonnull align 8 dereferenceable(148) %50)
+          to label %52 unwind label %72
 
-32:                                               ; preds = %cff_switch
-  %33 = load ptr, ptr %5, align 8
-  %34 = load i64, ptr %6, align 8
-  %35 = getelementptr inbounds i8, ptr %33, i64 %34
-  store i32 12, ptr %cff_state, align 4
-  br label %cff_loop_end
+52:                                               ; preds = %36
+  %53 = getelementptr inbounds %"class.std::__1::ostreambuf_iterator", ptr %11, i32 0, i32 0
+  %54 = load ptr, ptr %53, align 8
+  %55 = ptrtoint ptr %54 to i64
+  %56 = invoke i64 @_ZNSt3__116__pad_and_outputB8ne180100IcNS_11char_traitsIcEEEENS_19ostreambuf_iteratorIT_T0_EES6_PKS4_S8_S8_RNS_8ios_baseES4_(i64 %55, ptr noundef %20, ptr noundef %37, ptr noundef %40, ptr noundef nonnull align 8 dereferenceable(136) %45, i8 noundef signext %51)
+          to label %57 unwind label %72
 
-bcf_orig_tail9:                                   ; preds = %cff_switch
-  store ptr %35, ptr %.reg2mem, align 8
-  store i32 15, ptr %cff_state, align 4
-  br label %cff_loop_end
+57:                                               ; preds = %52
+  %58 = getelementptr inbounds %"class.std::__1::ostreambuf_iterator", ptr %10, i32 0, i32 0
+  %59 = inttoptr i64 %56 to ptr
+  store ptr %59, ptr %58, align 8
+  %60 = call noundef zeroext i1 @_ZNKSt3__119ostreambuf_iteratorIcNS_11char_traitsIcEEE6failedB8ne180100Ev(ptr noundef nonnull align 8 dereferenceable(8) %10) #7
+  br i1 %60, label %61, label %88
 
-36:                                               ; preds = %cff_switch
-  %37 = load ptr, ptr %5, align 8
-  store i32 14, ptr %cff_state, align 4
-  br label %cff_loop_end
+61:                                               ; preds = %57
+  %62 = load ptr, ptr %4, align 8
+  %63 = load ptr, ptr %62, align 8
+  %64 = getelementptr i8, ptr %63, i64 -24
+  %65 = load i64, ptr %64, align 8
+  %66 = getelementptr inbounds i8, ptr %62, i64 %65
+  invoke void @_ZNSt3__19basic_iosIcNS_11char_traitsIcEEE8setstateB8ne180100Ej(ptr noundef nonnull align 8 dereferenceable(148) %66, i32 noundef 5)
+          to label %67 unwind label %72
 
-bcf_orig_tail11:                                  ; preds = %cff_switch
-  store ptr %37, ptr %.reg2mem, align 8
-  store i32 15, ptr %cff_state, align 4
-  br label %cff_loop_end
+67:                                               ; preds = %61
+  br label %88
 
-38:                                               ; preds = %cff_switch
-  %.reload = load ptr, ptr %.reg2mem, align 8
-  %39 = load ptr, ptr %5, align 8
-  %40 = load i64, ptr %6, align 8
-  %41 = getelementptr inbounds i8, ptr %39, i64 %40
-  %42 = load ptr, ptr %4, align 8
-  %43 = load ptr, ptr %42, align 8
-  %44 = getelementptr i8, ptr %43, i64 -24
-  %45 = load i64, ptr %44, align 8
-  %46 = getelementptr inbounds i8, ptr %42, i64 %45
-  %47 = load ptr, ptr %4, align 8
-  %48 = load ptr, ptr %47, align 8
-  %49 = getelementptr i8, ptr %48, i64 -24
-  %50 = load i64, ptr %49, align 8
-  %51 = getelementptr inbounds i8, ptr %47, i64 %50
-  store i32 16, ptr %cff_state, align 4
-  br label %cff_loop_end
-
-bcf_orig_tail13:                                  ; preds = %cff_switch
-  %52 = invoke noundef signext i8 @_ZNKSt3__19basic_iosIcNS_11char_traitsIcEEE4fillB8ne180100Ev(ptr noundef nonnull align 8 dereferenceable(148) %51)
-          to label %53 unwind label %74
-
-53:                                               ; preds = %cff_switch, %bcf_orig_tail13
-  %54 = getelementptr inbounds %"class.std::__1::ostreambuf_iterator", ptr %11, i32 0, i32 0
-  %55 = load ptr, ptr %54, align 8
-  %56 = ptrtoint ptr %55 to i64
-  store i32 18, ptr %cff_state, align 4
-  br label %cff_loop_end
-
-bcf_orig_tail15:                                  ; preds = %cff_switch
-  %57 = invoke i64 @_ZNSt3__116__pad_and_outputB8ne180100IcNS_11char_traitsIcEEEENS_19ostreambuf_iteratorIT_T0_EES6_PKS4_S8_S8_RNS_8ios_baseES4_(i64 %56, ptr noundef %21, ptr noundef %.reload, ptr noundef %41, ptr noundef nonnull align 8 dereferenceable(136) %46, i8 noundef signext %52)
-          to label %58 unwind label %74
-
-58:                                               ; preds = %cff_switch, %bcf_orig_tail15
-  %59 = getelementptr inbounds %"class.std::__1::ostreambuf_iterator", ptr %10, i32 0, i32 0
-  %60 = inttoptr i64 %57 to ptr
-  store ptr %60, ptr %59, align 8
-  %61 = call noundef zeroext i1 @_ZNKSt3__119ostreambuf_iteratorIcNS_11char_traitsIcEEE6failedB8ne180100Ev(ptr noundef nonnull align 8 dereferenceable(8) %10) #7
-  store i32 20, ptr %cff_state, align 4
-  br label %cff_loop_end
-
-bcf_orig_tail17:                                  ; preds = %cff_switch
-  %62 = select i1 %61, i32 21, i32 31
-  store i32 %62, ptr %cff_state, align 4
-  br label %cff_loop_end
-
-63:                                               ; preds = %cff_switch
-  %64 = load ptr, ptr %4, align 8
-  %65 = load ptr, ptr %64, align 8
-  %66 = getelementptr i8, ptr %65, i64 -24
-  %67 = load i64, ptr %66, align 8
-  %68 = getelementptr inbounds i8, ptr %64, i64 %67
-  store i32 22, ptr %cff_state, align 4
-  br label %cff_loop_end
-
-bcf_orig_tail19:                                  ; preds = %cff_switch
-  invoke void @_ZNSt3__19basic_iosIcNS_11char_traitsIcEEE8setstateB8ne180100Ej(ptr noundef nonnull align 8 dereferenceable(148) %68, i32 noundef 5)
-          to label %69 unwind label %74
-
-69:                                               ; preds = %cff_switch, %bcf_orig_tail19
-  store i32 31, ptr %cff_state, align 4
-  br label %cff_loop_end
-
-70:                                               ; preds = %bcf_orig_tail
-  %71 = landingpad { ptr, i32 }
+68:                                               ; preds = %3
+  %69 = landingpad { ptr, i32 }
           catch ptr null
-  %72 = extractvalue { ptr, i32 } %71, 0
-  store ptr %72, ptr %8, align 8
-  %73 = extractvalue { ptr, i32 } %71, 1
-  store i32 %73, ptr %9, align 4
-  br i1 true, label %bcf_orig_tail21, label %bcf_junk22
+  %70 = extractvalue { ptr, i32 } %69, 0
+  store ptr %70, ptr %8, align 8
+  %71 = extractvalue { ptr, i32 } %69, 1
+  store i32 %71, ptr %9, align 4
+  br label %77
 
-bcf_orig_tail21:                                  ; preds = %cff_switch, %70
-  store i32 25, ptr %cff_state, align 4
-  br label %cff_loop_end
-
-74:                                               ; preds = %bcf_orig_tail19, %bcf_orig_tail15, %bcf_orig_tail13, %bcf_orig_tail5, %bcf_orig_tail1
-  %75 = landingpad { ptr, i32 }
+72:                                               ; preds = %61, %52, %36, %17, %14
+  %73 = landingpad { ptr, i32 }
           catch ptr null
-  %76 = extractvalue { ptr, i32 } %75, 0
-  store ptr %76, ptr %8, align 8
-  %77 = extractvalue { ptr, i32 } %75, 1
-  store i32 %77, ptr %9, align 4
-  %78 = call noundef ptr @_ZNSt3__113basic_ostreamIcNS_11char_traitsIcEEE6sentryD1Ev(ptr noundef nonnull align 8 dereferenceable(16) %7) #7
-  br label %79
+  %74 = extractvalue { ptr, i32 } %73, 0
+  store ptr %74, ptr %8, align 8
+  %75 = extractvalue { ptr, i32 } %73, 1
+  store i32 %75, ptr %9, align 4
+  %76 = call noundef ptr @_ZNSt3__113basic_ostreamIcNS_11char_traitsIcEEE6sentryD1Ev(ptr noundef nonnull align 8 dereferenceable(16) %7) #7
+  br label %77
 
-79:                                               ; preds = %cff_switch, %74
-  %80 = load ptr, ptr %8, align 8
-  %81 = call ptr @__cxa_begin_catch(ptr %80) #7
-  %82 = load ptr, ptr %4, align 8
-  %83 = load ptr, ptr %82, align 8
-  %84 = getelementptr i8, ptr %83, i64 -24
-  %85 = load i64, ptr %84, align 8
-  %86 = getelementptr inbounds i8, ptr %82, i64 %85
-  store i32 26, ptr %cff_state, align 4
-  br label %cff_loop_end
+77:                                               ; preds = %72, %68
+  %78 = load ptr, ptr %8, align 8
+  %79 = call ptr @__cxa_begin_catch(ptr %78) #7
+  %80 = load ptr, ptr %4, align 8
+  %81 = load ptr, ptr %80, align 8
+  %82 = getelementptr i8, ptr %81, i64 -24
+  %83 = load i64, ptr %82, align 8
+  %84 = getelementptr inbounds i8, ptr %80, i64 %83
+  invoke void @_ZNSt3__18ios_base33__set_badbit_and_consider_rethrowEv(ptr noundef nonnull align 8 dereferenceable(136) %84)
+          to label %85 unwind label %91
 
-bcf_orig_tail23:                                  ; preds = %cff_switch
-  invoke void @_ZNSt3__18ios_base33__set_badbit_and_consider_rethrowEv(ptr noundef nonnull align 8 dereferenceable(136) %86)
-          to label %87 unwind label %93
-
-87:                                               ; preds = %cff_switch, %bcf_orig_tail23
+85:                                               ; preds = %77
   call void @__cxa_end_catch()
-  store i32 28, ptr %cff_state, align 4
-  br label %cff_loop_end
+  br label %86
 
-bcf_orig_tail25:                                  ; preds = %cff_switch
-  store i32 29, ptr %cff_state, align 4
-  br label %cff_loop_end
+86:                                               ; preds = %89, %85
+  %87 = load ptr, ptr %4, align 8
+  ret ptr %87
 
-88:                                               ; preds = %cff_switch
-  %89 = load ptr, ptr %4, align 8
-  store i32 30, ptr %cff_state, align 4
-  br label %cff_loop_end
+88:                                               ; preds = %67, %57
+  br label %89
 
-bcf_orig_tail27:                                  ; preds = %cff_switch
-  ret ptr %89
+89:                                               ; preds = %88, %16
+  %90 = call noundef ptr @_ZNSt3__113basic_ostreamIcNS_11char_traitsIcEEE6sentryD1Ev(ptr noundef nonnull align 8 dereferenceable(16) %7) #7
+  br label %86
 
-90:                                               ; preds = %cff_switch
-  store i32 32, ptr %cff_state, align 4
-  br label %cff_loop_end
-
-bcf_orig_tail29:                                  ; preds = %cff_switch
-  store i32 33, ptr %cff_state, align 4
-  br label %cff_loop_end
-
-91:                                               ; preds = %cff_switch
-  %92 = call noundef ptr @_ZNSt3__113basic_ostreamIcNS_11char_traitsIcEEE6sentryD1Ev(ptr noundef nonnull align 8 dereferenceable(16) %7) #7
-  store i32 34, ptr %cff_state, align 4
-  br label %cff_loop_end
-
-bcf_orig_tail31:                                  ; preds = %cff_switch
-  store i32 29, ptr %cff_state, align 4
-  br label %cff_loop_end
-
-93:                                               ; preds = %bcf_orig_tail23
-  %94 = landingpad { ptr, i32 }
+91:                                               ; preds = %77
+  %92 = landingpad { ptr, i32 }
           cleanup
-  %95 = extractvalue { ptr, i32 } %94, 0
-  store ptr %95, ptr %8, align 8
-  %96 = extractvalue { ptr, i32 } %94, 1
-  store i32 %96, ptr %9, align 4
-  br i1 true, label %bcf_orig_tail33, label %bcf_junk34
-
-bcf_orig_tail33:                                  ; preds = %cff_switch, %93
+  %93 = extractvalue { ptr, i32 } %92, 0
+  store ptr %93, ptr %8, align 8
+  %94 = extractvalue { ptr, i32 } %92, 1
+  store i32 %94, ptr %9, align 4
   invoke void @__cxa_end_catch()
-          to label %97 unwind label %103
+          to label %95 unwind label %101
 
-97:                                               ; preds = %cff_switch, %bcf_orig_tail33
-  store i32 37, ptr %cff_state, align 4
-  br label %cff_loop_end
+95:                                               ; preds = %91
+  br label %96
 
-bcf_orig_tail35:                                  ; preds = %cff_switch
-  store i32 38, ptr %cff_state, align 4
-  br label %cff_loop_end
+96:                                               ; preds = %95
+  %97 = load ptr, ptr %8, align 8
+  %98 = load i32, ptr %9, align 4
+  %99 = insertvalue { ptr, i32 } poison, ptr %97, 0
+  %100 = insertvalue { ptr, i32 } %99, i32 %98, 1
+  resume { ptr, i32 } %100
 
-98:                                               ; preds = %cff_switch
-  %99 = load ptr, ptr %8, align 8
-  %100 = load i32, ptr %9, align 4
-  %101 = insertvalue { ptr, i32 } poison, ptr %99, 0
-  %102 = insertvalue { ptr, i32 } %101, i32 %100, 1
-  store i32 39, ptr %cff_state, align 4
-  br label %cff_loop_end
-
-bcf_orig_tail37:                                  ; preds = %cff_switch
-  resume { ptr, i32 } %102
-
-103:                                              ; preds = %bcf_orig_tail33
-  %104 = landingpad { ptr, i32 }
+101:                                              ; preds = %91
+  %102 = landingpad { ptr, i32 }
           catch ptr null
-  %105 = extractvalue { ptr, i32 } %104, 0
-  call void @__clang_call_terminate(ptr %105) #8
-  br i1 true, label %bcf_orig_tail39, label %bcf_junk40
-
-bcf_orig_tail39:                                  ; preds = %cff_switch, %103
+  %103 = extractvalue { ptr, i32 } %102, 0
+  call void @__clang_call_terminate(ptr %103) #8
   unreachable
-
-bcf_junk:                                         ; preds = %cff_switch
-  store i32 2, ptr %cff_state, align 4
-  br label %cff_loop_end
-
-bcf_junk2:                                        ; preds = %cff_switch
-  store i32 4, ptr %cff_state, align 4
-  br label %cff_loop_end
-
-bcf_junk4:                                        ; preds = %cff_switch
-  store i32 6, ptr %cff_state, align 4
-  br label %cff_loop_end
-
-bcf_junk6:                                        ; preds = %cff_switch
-  store i32 8, ptr %cff_state, align 4
-  br label %cff_loop_end
-
-bcf_junk8:                                        ; preds = %cff_switch
-  store i32 10, ptr %cff_state, align 4
-  br label %cff_loop_end
-
-bcf_junk10:                                       ; preds = %cff_switch
-  store i32 12, ptr %cff_state, align 4
-  br label %cff_loop_end
-
-bcf_junk12:                                       ; preds = %cff_switch
-  store i32 14, ptr %cff_state, align 4
-  br label %cff_loop_end
-
-bcf_junk14:                                       ; preds = %cff_switch
-  store i32 16, ptr %cff_state, align 4
-  br label %cff_loop_end
-
-bcf_junk16:                                       ; preds = %cff_switch
-  store i32 18, ptr %cff_state, align 4
-  br label %cff_loop_end
-
-bcf_junk18:                                       ; preds = %cff_switch
-  store i32 20, ptr %cff_state, align 4
-  br label %cff_loop_end
-
-bcf_junk20:                                       ; preds = %cff_switch
-  store i32 22, ptr %cff_state, align 4
-  br label %cff_loop_end
-
-bcf_junk22:                                       ; preds = %cff_switch, %70
-  store i32 24, ptr %cff_state, align 4
-  br label %cff_loop_end
-
-bcf_junk24:                                       ; preds = %cff_switch
-  store i32 26, ptr %cff_state, align 4
-  br label %cff_loop_end
-
-bcf_junk26:                                       ; preds = %cff_switch
-  store i32 28, ptr %cff_state, align 4
-  br label %cff_loop_end
-
-bcf_junk28:                                       ; preds = %cff_switch
-  store i32 30, ptr %cff_state, align 4
-  br label %cff_loop_end
-
-bcf_junk30:                                       ; preds = %cff_switch
-  store i32 32, ptr %cff_state, align 4
-  br label %cff_loop_end
-
-bcf_junk32:                                       ; preds = %cff_switch
-  store i32 34, ptr %cff_state, align 4
-  br label %cff_loop_end
-
-bcf_junk34:                                       ; preds = %cff_switch, %93
-  store i32 35, ptr %cff_state, align 4
-  br label %cff_loop_end
-
-bcf_junk36:                                       ; preds = %cff_switch
-  store i32 37, ptr %cff_state, align 4
-  br label %cff_loop_end
-
-bcf_junk38:                                       ; preds = %cff_switch
-  store i32 39, ptr %cff_state, align 4
-  br label %cff_loop_end
-
-bcf_junk40:                                       ; preds = %cff_switch, %103
-  store i32 40, ptr %cff_state, align 4
-  br label %cff_loop_end
-
-cff_loop_entry:                                   ; preds = %cff_loop_end, %3
-  %cff_state_load = load i32, ptr %cff_state, align 4
-  br label %cff_switch
-
-cff_loop_end:                                     ; preds = %bcf_junk40, %bcf_junk38, %bcf_junk36, %bcf_junk34, %bcf_junk32, %bcf_junk30, %bcf_junk28, %bcf_junk26, %bcf_junk24, %bcf_junk22, %bcf_junk20, %bcf_junk18, %bcf_junk16, %bcf_junk14, %bcf_junk12, %bcf_junk10, %bcf_junk8, %bcf_junk6, %bcf_junk4, %bcf_junk2, %bcf_junk, %98, %bcf_orig_tail35, %97, %bcf_orig_tail31, %91, %bcf_orig_tail29, %90, %88, %bcf_orig_tail25, %87, %79, %bcf_orig_tail21, %69, %63, %bcf_orig_tail17, %58, %53, %38, %bcf_orig_tail11, %36, %bcf_orig_tail9, %32, %bcf_orig_tail7, %28, %18, %bcf_orig_tail3, %16, %14, %cff_entry, %cff_switch
-  br label %cff_loop_entry
-
-cff_switch:                                       ; preds = %cff_loop_entry
-  switch i32 %cff_state_load, label %cff_loop_end [
-    i32 1, label %cff_entry
-    i32 2, label %bcf_orig_tail
-    i32 3, label %14
-    i32 4, label %bcf_orig_tail1
-    i32 5, label %16
-    i32 6, label %bcf_orig_tail3
-    i32 7, label %18
-    i32 8, label %bcf_orig_tail5
-    i32 9, label %28
-    i32 10, label %bcf_orig_tail7
-    i32 11, label %32
-    i32 12, label %bcf_orig_tail9
-    i32 13, label %36
-    i32 14, label %bcf_orig_tail11
-    i32 15, label %38
-    i32 16, label %bcf_orig_tail13
-    i32 17, label %53
-    i32 18, label %bcf_orig_tail15
-    i32 19, label %58
-    i32 20, label %bcf_orig_tail17
-    i32 21, label %63
-    i32 22, label %bcf_orig_tail19
-    i32 23, label %69
-    i32 24, label %bcf_orig_tail21
-    i32 25, label %79
-    i32 26, label %bcf_orig_tail23
-    i32 27, label %87
-    i32 28, label %bcf_orig_tail25
-    i32 29, label %88
-    i32 30, label %bcf_orig_tail27
-    i32 31, label %90
-    i32 32, label %bcf_orig_tail29
-    i32 33, label %91
-    i32 34, label %bcf_orig_tail31
-    i32 35, label %bcf_orig_tail33
-    i32 36, label %97
-    i32 37, label %bcf_orig_tail35
-    i32 38, label %98
-    i32 39, label %bcf_orig_tail37
-    i32 40, label %bcf_orig_tail39
-    i32 41, label %bcf_junk
-    i32 42, label %bcf_junk2
-    i32 43, label %bcf_junk4
-    i32 44, label %bcf_junk6
-    i32 45, label %bcf_junk8
-    i32 46, label %bcf_junk10
-    i32 47, label %bcf_junk12
-    i32 48, label %bcf_junk14
-    i32 49, label %bcf_junk16
-    i32 50, label %bcf_junk18
-    i32 51, label %bcf_junk20
-    i32 52, label %bcf_junk22
-    i32 53, label %bcf_junk24
-    i32 54, label %bcf_junk26
-    i32 55, label %bcf_junk28
-    i32 56, label %bcf_junk30
-    i32 57, label %bcf_junk32
-    i32 58, label %bcf_junk34
-    i32 59, label %bcf_junk36
-    i32 60, label %bcf_junk38
-    i32 61, label %bcf_junk40
-  ]
 }
 
 ; Function Attrs: mustprogress noinline nounwind optnone ssp uwtable(sync)
@@ -632,9 +370,6 @@ define linkonce_odr hidden i64 @_ZNSt3__116__pad_and_outputB8ne180100IcNS_11char
 
 26:                                               ; preds = %6
   call void @llvm.memcpy.p0.p0.i64(ptr align 8 %7, ptr align 8 %8, i64 8, i1 false)
-  br i1 true, label %bcf_orig_tail, label %bcf_junk
-
-bcf_orig_tail:                                    ; preds = %26, %bcf_junk
   br label %111
 
 27:                                               ; preds = %6
@@ -661,12 +396,9 @@ bcf_orig_tail:                                    ; preds = %26, %bcf_junk
 
 42:                                               ; preds = %27
   store i64 0, ptr %15, align 8
-  br i1 true, label %bcf_orig_tail1, label %bcf_junk2
-
-bcf_orig_tail1:                                   ; preds = %42, %bcf_junk2
   br label %43
 
-43:                                               ; preds = %bcf_orig_tail1, %38
+43:                                               ; preds = %42, %38
   %44 = load ptr, ptr %10, align 8
   %45 = load ptr, ptr %9, align 8
   %46 = ptrtoint ptr %44 to i64
@@ -675,12 +407,9 @@ bcf_orig_tail1:                                   ; preds = %42, %bcf_junk2
   store i64 %48, ptr %16, align 8
   %49 = load i64, ptr %16, align 8
   %50 = icmp sgt i64 %49, 0
-  br i1 true, label %bcf_orig_tail3, label %bcf_junk4
-
-bcf_orig_tail3:                                   ; preds = %43, %bcf_junk4
   br i1 %50, label %51, label %62
 
-51:                                               ; preds = %bcf_orig_tail3
+51:                                               ; preds = %43
   %52 = getelementptr inbounds %"class.std::__1::ostreambuf_iterator", ptr %8, i32 0, i32 0
   %53 = load ptr, ptr %52, align 8
   %54 = load ptr, ptr %9, align 8
@@ -694,18 +423,12 @@ bcf_orig_tail3:                                   ; preds = %43, %bcf_junk4
   %60 = getelementptr inbounds %"class.std::__1::ostreambuf_iterator", ptr %8, i32 0, i32 0
   store ptr null, ptr %60, align 8
   call void @llvm.memcpy.p0.p0.i64(ptr align 8 %7, ptr align 8 %8, i64 8, i1 false)
-  br i1 true, label %bcf_orig_tail5, label %bcf_junk6
-
-bcf_orig_tail5:                                   ; preds = %59, %bcf_junk6
   br label %111
 
 61:                                               ; preds = %51
-  br i1 true, label %bcf_orig_tail7, label %bcf_junk8
-
-bcf_orig_tail7:                                   ; preds = %61, %bcf_junk8
   br label %62
 
-62:                                               ; preds = %bcf_orig_tail7, %bcf_orig_tail3
+62:                                               ; preds = %61, %43
   %63 = load i64, ptr %15, align 8
   %64 = icmp sgt i64 %63, 0
   br i1 %64, label %65, label %89
@@ -718,28 +441,22 @@ bcf_orig_tail7:                                   ; preds = %61, %bcf_junk8
   %70 = load ptr, ptr %69, align 8
   %71 = call noundef ptr @_ZNSt3__112basic_stringIcNS_11char_traitsIcEENS_9allocatorIcEEE4dataB8ne180100Ev(ptr noundef nonnull align 8 dereferenceable(24) %17) #7
   %72 = load i64, ptr %15, align 8
-  br i1 true, label %bcf_orig_tail9, label %bcf_junk10
-
-bcf_orig_tail9:                                   ; preds = %65, %bcf_junk10
   %73 = invoke noundef i64 @_ZNSt3__115basic_streambufIcNS_11char_traitsIcEEE5sputnB8ne180100EPKcl(ptr noundef nonnull align 8 dereferenceable(64) %70, ptr noundef %71, i64 noundef %72)
           to label %74 unwind label %79
 
-74:                                               ; preds = %bcf_orig_tail9
+74:                                               ; preds = %65
   %75 = load i64, ptr %15, align 8
   %76 = icmp ne i64 %73, %75
-  br i1 true, label %bcf_orig_tail11, label %bcf_junk12
-
-bcf_orig_tail11:                                  ; preds = %74, %bcf_junk12
   br i1 %76, label %77, label %84
 
-77:                                               ; preds = %bcf_orig_tail11
+77:                                               ; preds = %74
   %78 = getelementptr inbounds %"class.std::__1::ostreambuf_iterator", ptr %8, i32 0, i32 0
   store ptr null, ptr %78, align 8
   call void @llvm.memcpy.p0.p0.i64(ptr align 8 %7, ptr align 8 %8, i64 8, i1 false)
   store i32 1, ptr %20, align 4
   br label %85
 
-79:                                               ; preds = %bcf_orig_tail9
+79:                                               ; preds = %65
   %80 = landingpad { ptr, i32 }
           cleanup
   %81 = extractvalue { ptr, i32 } %80, 0
@@ -747,27 +464,21 @@ bcf_orig_tail11:                                  ; preds = %74, %bcf_junk12
   %82 = extractvalue { ptr, i32 } %80, 1
   store i32 %82, ptr %19, align 4
   %83 = call noundef ptr @_ZNSt3__112basic_stringIcNS_11char_traitsIcEENS_9allocatorIcEEED1Ev(ptr noundef nonnull align 8 dereferenceable(24) %17) #7
-  br i1 true, label %bcf_orig_tail13, label %bcf_junk14
-
-bcf_orig_tail13:                                  ; preds = %79, %bcf_junk14
   br label %115
 
-84:                                               ; preds = %bcf_orig_tail11
+84:                                               ; preds = %74
   store i32 0, ptr %20, align 4
   br label %85
 
 85:                                               ; preds = %84, %77
   %86 = call noundef ptr @_ZNSt3__112basic_stringIcNS_11char_traitsIcEENS_9allocatorIcEEED1Ev(ptr noundef nonnull align 8 dereferenceable(24) %17) #7
   %87 = load i32, ptr %20, align 4
-  br i1 true, label %bcf_orig_tail15, label %bcf_junk16
-
-bcf_orig_tail15:                                  ; preds = %85, %bcf_junk16
   switch i32 %87, label %120 [
     i32 0, label %88
     i32 1, label %111
   ]
 
-88:                                               ; preds = %bcf_orig_tail15
+88:                                               ; preds = %85
   br label %89
 
 89:                                               ; preds = %88, %62
@@ -795,9 +506,6 @@ bcf_orig_tail15:                                  ; preds = %85, %bcf_junk16
   %106 = getelementptr inbounds %"class.std::__1::ostreambuf_iterator", ptr %8, i32 0, i32 0
   store ptr null, ptr %106, align 8
   call void @llvm.memcpy.p0.p0.i64(ptr align 8 %7, ptr align 8 %8, i64 8, i1 false)
-  br i1 true, label %bcf_orig_tail17, label %bcf_junk18
-
-bcf_orig_tail17:                                  ; preds = %105, %bcf_junk18
   br label %111
 
 107:                                              ; preds = %97
@@ -807,65 +515,23 @@ bcf_orig_tail17:                                  ; preds = %105, %bcf_junk18
   %109 = load ptr, ptr %12, align 8
   %110 = call noundef i64 @_ZNSt3__18ios_base5widthB8ne180100El(ptr noundef nonnull align 8 dereferenceable(136) %109, i64 noundef 0)
   call void @llvm.memcpy.p0.p0.i64(ptr align 8 %7, ptr align 8 %8, i64 8, i1 false)
-  br i1 true, label %bcf_orig_tail19, label %bcf_junk20
-
-bcf_orig_tail19:                                  ; preds = %108, %bcf_junk20
   br label %111
 
-111:                                              ; preds = %bcf_orig_tail19, %bcf_orig_tail17, %bcf_orig_tail15, %bcf_orig_tail5, %bcf_orig_tail
+111:                                              ; preds = %108, %105, %85, %59, %26
   %112 = getelementptr inbounds %"class.std::__1::ostreambuf_iterator", ptr %7, i32 0, i32 0
   %113 = load ptr, ptr %112, align 8
   %114 = ptrtoint ptr %113 to i64
-  br i1 true, label %bcf_orig_tail21, label %bcf_junk22
-
-bcf_orig_tail21:                                  ; preds = %111, %bcf_junk22
   ret i64 %114
 
-115:                                              ; preds = %bcf_orig_tail13
+115:                                              ; preds = %79
   %116 = load ptr, ptr %18, align 8
   %117 = load i32, ptr %19, align 4
   %118 = insertvalue { ptr, i32 } poison, ptr %116, 0
   %119 = insertvalue { ptr, i32 } %118, i32 %117, 1
   resume { ptr, i32 } %119
 
-120:                                              ; preds = %bcf_orig_tail15
+120:                                              ; preds = %85
   unreachable
-
-bcf_junk:                                         ; preds = %26
-  br label %bcf_orig_tail
-
-bcf_junk2:                                        ; preds = %42
-  br label %bcf_orig_tail1
-
-bcf_junk4:                                        ; preds = %43
-  br label %bcf_orig_tail3
-
-bcf_junk6:                                        ; preds = %59
-  br label %bcf_orig_tail5
-
-bcf_junk8:                                        ; preds = %61
-  br label %bcf_orig_tail7
-
-bcf_junk10:                                       ; preds = %65
-  br label %bcf_orig_tail9
-
-bcf_junk12:                                       ; preds = %74
-  br label %bcf_orig_tail11
-
-bcf_junk14:                                       ; preds = %79
-  br label %bcf_orig_tail13
-
-bcf_junk16:                                       ; preds = %85
-  br label %bcf_orig_tail15
-
-bcf_junk18:                                       ; preds = %105
-  br label %bcf_orig_tail17
-
-bcf_junk20:                                       ; preds = %108
-  br label %bcf_orig_tail19
-
-bcf_junk22:                                       ; preds = %111
-  br label %bcf_orig_tail21
 }
 
 ; Function Attrs: mustprogress noinline nounwind optnone ssp uwtable(sync)
@@ -1319,17 +985,14 @@ define linkonce_odr hidden noundef signext i8 @_ZNKSt3__19basic_iosIcNS_11char_t
 
 10:                                               ; preds = %2
   %11 = load i8, ptr %4, align 1
-  br i1 true, label %bcf_orig_tail, label %bcf_junk
-
-bcf_orig_tail:                                    ; preds = %10, %bcf_junk
   %12 = invoke noundef signext i8 @_ZNKSt3__15ctypeIcE5widenB8ne180100Ec(ptr noundef nonnull align 8 dereferenceable(25) %9, i8 noundef signext %11)
           to label %13 unwind label %15
 
-13:                                               ; preds = %bcf_orig_tail
+13:                                               ; preds = %10
   %14 = call noundef ptr @_ZNSt3__16localeD1Ev(ptr noundef nonnull align 8 dereferenceable(8) %5) #7
   ret i8 %12
 
-15:                                               ; preds = %bcf_orig_tail, %2
+15:                                               ; preds = %10, %2
   %16 = landingpad { ptr, i32 }
           cleanup
   %17 = extractvalue { ptr, i32 } %16, 0
@@ -1337,23 +1000,14 @@ bcf_orig_tail:                                    ; preds = %10, %bcf_junk
   %18 = extractvalue { ptr, i32 } %16, 1
   store i32 %18, ptr %7, align 4
   %19 = call noundef ptr @_ZNSt3__16localeD1Ev(ptr noundef nonnull align 8 dereferenceable(8) %5) #7
-  br i1 true, label %bcf_orig_tail1, label %bcf_junk2
-
-bcf_orig_tail1:                                   ; preds = %15, %bcf_junk2
   br label %20
 
-20:                                               ; preds = %bcf_orig_tail1
+20:                                               ; preds = %15
   %21 = load ptr, ptr %6, align 8
   %22 = load i32, ptr %7, align 4
   %23 = insertvalue { ptr, i32 } poison, ptr %21, 0
   %24 = insertvalue { ptr, i32 } %23, i32 %22, 1
   resume { ptr, i32 } %24
-
-bcf_junk:                                         ; preds = %10
-  br label %bcf_orig_tail
-
-bcf_junk2:                                        ; preds = %15
-  br label %bcf_orig_tail1
 }
 
 ; Function Attrs: mustprogress noinline optnone ssp uwtable(sync)
