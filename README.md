@@ -7,9 +7,9 @@ An LLVM IR pass pipeline that analyzes each function's complexity and sensitivit
 1. **Feature Extraction Engine**: Extracts structural and syntactical features from LLVM IR functions.
 2. **Security & Threat Analyzer**: Scores function risk and categorizes sensitivity.
 3. **Protection Planner**: Rule-based logic mapping risk to obfuscation plans.
-4. **Diversification Engine**: Randomizes execution order and config based on seeds.
-5. **Orchestration Layer / Existing OLLVM Passes**: Core control-flow flattening, bogus control flow, etc.
-6. **AI-Resistant Diversification Passes**: Decoy idiom injection, semantic divergence, symbol alteration.
+4. **Orchestration Layer / Existing OLLVM Passes**: Core control-flow flattening, bogus control flow, etc.
+5. **AI-Resistant Diversification Passes**: Decoy idiom injection, semantic divergence, symbol alteration.
+6. **Diversification Engine**: Randomizes execution order and config based on seeds.
 7. **Build Controller & Evaluation Engine**: Orchestrates the modules into a cohesive pipeline and measures runtime/size overhead and resistance against RE.
 
 ## Build Instructions
@@ -29,9 +29,9 @@ An LLVM IR pass pipeline that analyzes each function's complexity and sensitivit
 | 1 | `src/analysis/feature_extraction.cpp` | Extracts CFG density, complexity, API calls. |
 | 2 | `src/analysis/threat_analyzer.cpp` | Analyzes threats and outputs risk scores. |
 | 3 | `src/planner/protection_planner.cpp` | Plans the set of passes and their intensity. |
-| 4 | `src/diversification/diversification_engine.cpp`| Orchestrates randomization of passes. |
-| 5 | `src/passes/existing/ollvm_passes.cpp` | Implements traditional OLLVM passes and orchestration. |
-| 6 | `src/passes/novel/ai_resistant_passes.cpp` | Implements AI-resistant passes (decoys, etc.). |
+| 4 | `src/passes/existing/ollvm_passes.cpp` | Implements traditional OLLVM passes and orchestration. |
+| 5 | `src/passes/novel/ai_resistant_passes.cpp` | Implements AI-resistant passes (decoys, etc.). |
+| 6 | `src/diversification/diversification_engine.cpp`| Orchestrates randomization of passes. |
 | 7 | `src/planner/build_controller.cpp` | Pipeline controller integrating everything and evaluating metrics. |
 
 ## Running the Pipeline
