@@ -26,6 +26,7 @@ add_library(Orchestration OBJECT
     src/orchestration/module4_orchestrator.cpp
     src/orchestration/fake_backend.cpp
     src/orchestration/real_backend.cpp
+    src/orchestration/diversification_controller.cpp
 )
 
 # Module 4: LLVM pass plugin (loaded by opt at runtime)
@@ -80,3 +81,8 @@ add_executable(test_real_backend
 )
 add_dependencies(test_real_backend ObfPasses)
 
+# Test: Diversification Controller
+add_executable(test_diversification_controller
+    tests/orchestration/test_diversification_controller.cpp
+    $<TARGET_OBJECTS:Orchestration>
+)

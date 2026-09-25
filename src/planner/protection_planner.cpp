@@ -13,7 +13,7 @@ namespace planner {
 int getPassPriority(const std::string& pass) {
     if (pass == "string_obfuscation" || pass == "instruction_substitution" || pass == "semantic_divergence") return 1;
     if (pass == "decoy_idiom" || pass == "bogus_control_flow") return 2;
-    if (pass == "control_flow_flattening" || pass == "adaptive_cfg_diversification") return 3;
+    if (pass == "control_flow_flattening") return 3; // TODO: "adaptive_cfg_diversification" was also here at priority 3, but is ambiguous.
     return 99;
 }
 
@@ -59,7 +59,9 @@ std::vector<ProtectionPlan> generate_plan(
         } else if (intensity == 2) {
             passes = {"instruction_substitution", "bogus_control_flow"};
         } else if (intensity == 3) {
-            passes = {"bogus_control_flow", "adaptive_cfg_diversification", "semantic_divergence"};
+            // TODO: "adaptive_cfg_diversification" appeared here but is not in the M4 or M5 pass lists.
+            // Leaving it out until it can be clarified whether it was meant to be "control_flow_flattening" or a new Module 6 pass.
+            passes = {"bogus_control_flow", "semantic_divergence"};
         } else if (intensity == 4) {
             passes = {"decoy_idiom", "bogus_control_flow", "control_flow_flattening"};
         } else {
@@ -74,7 +76,7 @@ std::vector<ProtectionPlan> generate_plan(
             if (std::find(passes.begin(), passes.end(), "decoy_idiom") == passes.end()) {
                 passes.push_back("decoy_idiom");
             }
-        } else if (report.sensitivity_category == "encryption" && feat.basic_block_count > 100) {
+        } else if (report.sensitivity_category == "cryptography" && feat.basic_block_count > 100) {
             // Remove heavy flattening to preserve perf
             passes.erase(std::remove(passes.begin(), passes.end(), "control_flow_flattening"), passes.end());
             if (std::find(passes.begin(), passes.end(), "semantic_divergence") == passes.end()) {

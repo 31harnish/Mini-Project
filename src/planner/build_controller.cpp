@@ -19,6 +19,7 @@
 #include "../analysis/threat_analyzer.h"
 #include "../orchestration/module4_orchestrator.h"
 #include "../orchestration/real_backend.h"
+#include "orchestration/diversification_controller.h"
 #include "planner_utils.h"
 #include "protection_planner.h"
 #include <iostream>
@@ -91,28 +92,55 @@ void run_full_pipeline(llvm::Module &M,
       continue;
     }
 
-    std::cout << "  [BuildController] Applying " << plan.selected_passes.size()
-              << " passes to '" << plan.function_name
+    std::cout << "  [BuildController] Generating up to " << plan.max_transformation_rounds
+              << " rounds for '" << plan.function_name
               << "' at intensity " << plan.intensity_level
               << " (seed=" << plan.random_seed << ")" << std::endl;
 
     try {
-      auto metrics = orchestration::RunModule4(
-          backend,
-          plan.function_name,
-          plan.selected_passes,
-          plan.intensity_level,
-          plan.random_seed,
-          current_input,
-          ir_out_path);
+      auto round_plans = orchestration::GenerateRoundPlans(plan.selected_passes, plan.random_seed, plan.max_transformation_rounds);
 
-      std::cout << "  [BuildController] Result: overhead=" << metrics.overhead
-                << " size_bloat=" << metrics.size_bloat
-                << " deterministic=" << (metrics.fully_deterministic ? "yes" : "no")
-                << std::endl;
+      for (size_t round_idx = 0; round_idx < round_plans.size(); ++round_idx) {
+          const auto& rp = round_plans[round_idx];
+          std::cout << "  [BuildController] --- Round " << (round_idx + 1) << " ---" << std::endl;
+          
+          std::vector<std::string> m4_passes;
+          std::vector<std::string> m5_passes;
 
-      // After the first successful run, subsequent plans chain from the output.
-      current_input = ir_out_path;
+          for (const auto& pass : rp.pass_order) {
+              if (pass == "instruction_substitution" || pass == "bogus_control_flow" || pass == "control_flow_flattening") {
+                  m4_passes.push_back(pass);
+              } else {
+                  m5_passes.push_back(pass);
+              }
+          }
+
+          for (const auto& m5_pass : m5_passes) {
+              std::cout << "  [Module 4] Skipping pass '" << m5_pass << "' — pending Module 5 implementation" << std::endl;
+          }
+
+          if (m4_passes.empty()) {
+              std::cout << "  [BuildController] No M4 passes selected for '" << plan.function_name << "'. Skipping Module 4 orchestration." << std::endl;
+              continue;
+          }
+
+          auto metrics = orchestration::RunModule4(
+              backend,
+              plan.function_name,
+              m4_passes,
+              plan.intensity_level,
+              rp.round_seed,
+              current_input,
+              ir_out_path);
+
+          std::cout << "  [BuildController] Result: overhead=" << metrics.overhead
+                    << " size_bloat=" << metrics.size_bloat
+                    << " deterministic=" << (metrics.fully_deterministic ? "yes" : "no")
+                    << std::endl;
+
+          // After the first successful run, subsequent plans chain from the output.
+          current_input = ir_out_path;
+      }
     } catch (const std::exception &e) {
       std::cerr << "  [BuildController] ERROR on '" << plan.function_name
                 << "': " << e.what() << std::endl;
